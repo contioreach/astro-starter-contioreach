@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "private": false,
   "type": "module",
-  "description": "A production-ready Astro blog powered by the ContioReach headless CMS — cached CMS reads with tag-style invalidation, on-demand revalidation webhooks, SEO metadata and JSON-LD, with zero client-side framework.",
+  "description": "Astro 7 headless CMS blog starter — a native tagged response cache with cache.invalidate(), a signed publish webhook, category archives, JSON-LD, sitemaps, and no client-side framework at all. Wired to the ContioReach headless CMS.",
   "license": "MIT",
   "homepage": "https://github.com/contioreach/astro-starter-contioreach#readme",
   "repository": {
@@ -12,15 +12,23 @@
   },
   "keywords": [
     "astro",
+    "astrojs",
     "headless-cms",
-    "blog",
+    "blog-starter",
     "islands",
+    "zero-javascript",
+    "cache-tags",
     "on-demand-revalidation",
-    "contioreach",
-    "example",
-    "starter",
+    "ssr",
+    "seo",
+    "json-ld",
+    "structured-data",
     "tailwindcss",
-    "seo"
+    "contioreach",
+    "cms",
+    "starter-template",
+    "headless cms blog",
+    "astro blog starter"
   ],
   "scripts": {
     "dev": "astro dev",

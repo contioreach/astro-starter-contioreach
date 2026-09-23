@@ -1,0 +1,58 @@
+---
+import BlogHero from "../../components/blog/BlogHero.astro";
+import BlogListing from "../../components/blog/BlogListing.astro";
+import CategoryPills from "../../components/blog/CategoryPills.astro";
+import CTASection from "../../components/blog/CTASection.astro";
+import Pagination from "../../components/blog/Pagination.astro";
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import { POSTS_PER_PAGE } from "../../consts.js";
+import { loadListing } from "../../lib/cms.js";
+import { breadcrumbSchema } from "../../lib/schema.js";
+
+const currentPage = Math.max(1, Number.parseInt(Astro.url.searchParams.get("page"), 10) || 1);
+
+const { posts, meta, categories } = await loadListing({
+  page: currentPage,
+  limit: POSTS_PER_PAGE,
+});
+
+const seo = {
+  title: "Blog | Headless CMS, SEO & Content Strategy | ContioReach",
+  description:
+    "Practical guides on headless CMS, SEO, AI search, blogging, and the workflows behind content that gets discovered, read, and cited.",
+  path: "/blog",
+  alt: "The ContioReach blog",
+  keywords: [
+    "headless cms blog",
+    "content marketing",
+    "seo tips",
+    "ai search optimization",
+    "blogging workflow",
+    "content strategy",
+  ],
+};
+---
+
+<BaseLayout seo={seo} jsonLd={[breadcrumbSchema([{ name: "Blog", path: "/blog" }])]}>
+  <BlogHero
+    paragraph="Headless CMS, SEO, AI search, and the workflows behind content that gets discovered, read, and cited."
+    stat={meta.total ? `${meta.total} articles and counting` : null}
+  >
+    <Fragment slot="heading">
+      Writing about the craft of{" "}
+      <span
+        class="bg-gradient-to-r from-fuchsia-400 via-violet-300 to-cyan-300 bg-clip-text text-transparent"
+      >
+        publishing well
+      </span>
+    </Fragment>
+  </BlogHero>
+
+  <div class="mx-auto max-w-7xl space-y-12 px-6 py-14">
+    <CategoryPills categories={categories} />
+    <BlogListing posts={posts} featureFirst={currentPage === 1} />
+    <Pagination meta={meta} basePath="/blog" />
+  </div>
+
+  <CTASection />
+</BaseLayout>

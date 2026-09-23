@@ -1,0 +1,73 @@
+---
+import BlogHero from "../../../components/blog/BlogHero.astro";
+import BlogListing from "../../../components/blog/BlogListing.astro";
+import CategoryPills from "../../../components/blog/CategoryPills.astro";
+import CTASection from "../../../components/blog/CTASection.astro";
+import Pagination from "../../../components/blog/Pagination.astro";
+import BaseLayout from "../../../layouts/BaseLayout.astro";
+import { POSTS_PER_PAGE } from "../../../consts.js";
+import { getCategory, loadListing } from "../../../lib/cms.js";
+import { breadcrumbSchema } from "../../../lib/schema.js";
+
+const { slug } = Astro.params;
+const currentPage = Math.max(1, Number.parseInt(Astro.url.searchParams.get("page"), 10) || 1);
+
+const category = await getCategory(slug);
+
+if (!category) {
+  return Astro.rewrite("/404");
+}
+
+const { posts, meta, categories } = await loadListing({
+  page: currentPage,
+  limit: POSTS_PER_PAGE,
+  category: slug,
+});
+
+const name = category.name;
+const lower = name.toLowerCase();
+
+const seo = {
+  title: `${name} Articles | ContioReach Blog`,
+  description:
+    category.description ||
+    `Expert insights, strategies, and guides on ${lower}. Browse every ${lower} article on the ContioReach blog.`,
+  path: `/blog/category/${slug}`,
+  alt: `${name} articles on the ContioReach blog`,
+  keywords: [lower, slug, "headless cms", "content marketing", "blog"],
+};
+
+// Built after the category loads so the crumb uses its display name.
+const jsonLd = [
+  breadcrumbSchema([
+    { name: "Blog", path: "/blog" },
+    { name, path: `/blog/category/${slug}` },
+  ]),
+];
+---
+
+<BaseLayout seo={seo} jsonLd={jsonLd}>
+  <BlogHero
+    eyebrow={name}
+    paragraph={category.description ||
+      `Expert insights, strategies, and guides on ${lower}, plus what we're learning building ContioReach.`}
+    stat={meta.total ? `${meta.total} articles in this category` : null}
+  >
+    <Fragment slot="heading">
+      Everything on{" "}
+      <span
+        class="bg-gradient-to-r from-fuchsia-400 via-violet-300 to-cyan-300 bg-clip-text text-transparent"
+      >
+        {name}
+      </span>
+    </Fragment>
+  </BlogHero>
+
+  <div class="mx-auto max-w-7xl space-y-12 px-6 py-14">
+    <CategoryPills categories={categories} active={slug} />
+    <BlogListing posts={posts} featureFirst={currentPage === 1} />
+    <Pagination meta={meta} basePath={`/blog/category/${slug}`} />
+  </div>
+
+  <CTASection />
+</BaseLayout>

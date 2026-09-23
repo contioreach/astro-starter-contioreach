@@ -1,0 +1,89 @@
+---
+const { url, title } = Astro.props;
+
+const u = encodeURIComponent(url);
+const t = encodeURIComponent(title || "");
+
+const iconClass =
+  "flex h-9 w-9 items-center justify-center rounded-full border border-white/12 bg-white/[0.04] text-zinc-300 transition hover:border-white/35 hover:text-white";
+---
+
+<div class="flex items-center gap-2" data-share data-url={url}>
+  <span class="mr-1 text-xs tracking-wide text-zinc-500 uppercase">Share</span>
+
+  <a
+    href={`https://twitter.com/intent/tweet?url=${u}&text=${t}`}
+    target="_blank"
+    rel="noopener noreferrer nofollow"
+    aria-label="Share on X"
+    class={iconClass}
+  >
+    <svg viewBox="0 0 24 24" class="h-4 w-4 fill-current" aria-hidden="true">
+      <path
+        d="M18.9 2h3.3l-7.2 8.2L23.5 22h-6.7l-5.2-6.8L5.6 22H2.3l7.7-8.8L2 2h6.8l4.7 6.2L18.9 2Zm-1.2 18h1.8L7.4 3.9H5.5L17.7 20Z"
+      ></path>
+    </svg>
+  </a>
+
+  <a
+    href={`https://www.linkedin.com/sharing/share-offsite/?url=${u}`}
+    target="_blank"
+    rel="noopener noreferrer nofollow"
+    aria-label="Share on LinkedIn"
+    class={iconClass}
+  >
+    <svg viewBox="0 0 24 24" class="h-4 w-4 fill-current" aria-hidden="true">
+      <path
+        d="M4.98 3.5a2.5 2.5 0 1 1 0 5 2.5 2.5 0 0 1 0-5ZM3 9h4v12H3V9Zm7 0h3.8v1.7h.05c.53-1 1.83-2.05 3.77-2.05C21.4 8.65 22 11 22 14.1V21h-4v-6.1c0-1.45-.03-3.3-2-3.3-2 0-2.3 1.57-2.3 3.2V21h-4V9Z"
+      ></path>
+    </svg>
+  </a>
+
+  <a href={`mailto:?subject=${t}&body=${u}`} aria-label="Share by email" class={iconClass}>
+    <svg viewBox="0 0 24 24" class="h-4 w-4 fill-none stroke-current stroke-[1.8]" aria-hidden="true">
+      <rect x="3" y="5" width="18" height="14" rx="2"></rect>
+      <path d="m3.5 7 8.5 6 8.5-6"></path>
+    </svg>
+  </a>
+
+  <button type="button" aria-label="Copy link" class={iconClass} data-copy>
+    <svg data-copy-idle viewBox="0 0 24 24" class="h-4 w-4 fill-none stroke-current stroke-[1.8]" aria-hidden="true">
+      <path d="M10 13a5 5 0 0 0 7 0l2-2a5 5 0 0 0-7-7l-1 1"></path>
+      <path d="M14 11a5 5 0 0 0-7 0l-2 2a5 5 0 0 0 7 7l1-1"></path>
+    </svg>
+    <svg data-copy-done hidden viewBox="0 0 24 24" class="h-4 w-4 fill-none stroke-current stroke-[2]" aria-hidden="true">
+      <path d="m5 13 4 4L19 7"></path>
+    </svg>
+  </button>
+
+  <span role="status" aria-live="polite" class="sr-only" data-copy-status></span>
+</div>
+
+<script>
+  const bar = document.querySelector("[data-share]");
+  if (bar) {
+    const button = bar.querySelector("[data-copy]");
+    const idle = bar.querySelector("[data-copy-idle]");
+    const done = bar.querySelector("[data-copy-done]");
+    const status = bar.querySelector("[data-copy-status]");
+    let timer;
+
+    button?.addEventListener("click", async () => {
+      try {
+        await navigator.clipboard.writeText(bar.dataset.url);
+      } catch {
+        // Clipboard is blocked in some contexts; the share links still work.
+        return;
+      }
+      idle.hidden = true;
+      done.hidden = false;
+      status.textContent = "Link copied";
+      clearTimeout(timer);
+      timer = setTimeout(() => {
+        idle.hidden = false;
+        done.hidden = true;
+        status.textContent = "";
+      }, 1800);
+    });
+  }
+</script>

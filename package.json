@@ -1,0 +1,39 @@
+{
+  "name": "astro-starter-contioreach",
+  "version": "1.0.0",
+  "private": false,
+  "type": "module",
+  "description": "A production-ready Astro blog powered by the ContioReach headless CMS — cached CMS reads with tag-style invalidation, on-demand revalidation webhooks, SEO metadata and JSON-LD, with zero client-side framework.",
+  "license": "MIT",
+  "homepage": "https://github.com/contioreach/astro-starter-contioreach#readme",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/contioreach/astro-starter-contioreach.git"
+  },
+  "keywords": [
+    "astro",
+    "headless-cms",
+    "blog",
+    "islands",
+    "on-demand-revalidation",
+    "contioreach",
+    "example",
+    "starter",
+    "tailwindcss",
+    "seo"
+  ],
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "astro": "astro"
+  },
+  "dependencies": {
+    "@astrojs/node": "^11.1.6",
+    "astro": "^7.3.4"
+  },
+  "devDependencies": {
+    "@tailwindcss/vite": "^4.3.3",
+    "tailwindcss": "^4.3.3"
+  }
+}

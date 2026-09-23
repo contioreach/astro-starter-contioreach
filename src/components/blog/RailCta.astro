@@ -1,0 +1,26 @@
+---
+import { PUBLIC_SIGNUP_URL } from "astro:env/client";
+
+const { slug } = Astro.props;
+
+// Attribution so the app can tell which article converted.
+const href = `${PUBLIC_SIGNUP_URL}?utm_source=blog&utm_medium=article_cta&utm_campaign=${encodeURIComponent(slug || "blog")}`;
+---
+
+<div
+  class="relative overflow-hidden rounded-2xl border border-white/10 bg-gradient-to-br from-fuchsia-600/25 to-cyan-500/20 p-5"
+>
+  <p class="text-base leading-snug font-semibold text-white">
+    Your blog deserves a better content layer.
+  </p>
+  <p class="mt-2 text-sm leading-relaxed text-zinc-300">
+    A headless CMS built specifically for blogs — plan, create, optimize, publish.
+  </p>
+  <a
+    href={href}
+    class="mt-4 block rounded-full bg-white px-4 py-2.5 text-center text-sm font-semibold text-zinc-950 transition hover:bg-zinc-200"
+  >
+    Start free
+  </a>
+  <p class="mt-2.5 text-center text-[11px] text-zinc-400">No credit card required</p>
+</div>

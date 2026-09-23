@@ -1,0 +1,76 @@
+---
+/* Sticky contents rail. The headings are parsed while rendering the article
+   and handed in, so the script below only tracks which one is on screen —
+   roughly 20 lines of DOM code instead of a client-side framework. */
+const { items = [] } = Astro.props;
+---
+
+{
+  items.length > 0 && (
+    <nav
+      aria-label="Table of contents"
+      class="rounded-2xl border border-white/10 bg-white/[0.03] p-5 backdrop-blur"
+      data-toc
+    >
+      <p class="mb-4 text-[11px] font-semibold tracking-[0.18em] text-zinc-500 uppercase">
+        On this page
+      </p>
+      <ul class="max-h-[60vh] space-y-1 overflow-y-auto border-l border-white/10">
+        {items.map((item) => (
+          <li>
+            <a
+              href={`#${item.id}`}
+              data-toc-link={item.id}
+              class="-ml-px block border-l-2 border-transparent py-1.5 pr-2 text-sm leading-snug text-zinc-400 transition hover:border-white/30 hover:text-zinc-200 aria-[current=true]:border-fuchsia-400 aria-[current=true]:font-medium aria-[current=true]:text-white"
+              style={`padding-left: ${14 + (item.level - 2) * 12}px`}
+            >
+              {item.title}
+            </a>
+          </li>
+        ))}
+      </ul>
+    </nav>
+  )
+}
+
+<script>
+  const root = document.querySelector("[data-toc]");
+  if (root) {
+    const links = [...root.querySelectorAll("[data-toc-link]")];
+    const byId = new Map(links.map((link) => [link.dataset.tocLink, link]));
+
+    const setActive = (id) => {
+      for (const link of links) link.removeAttribute("aria-current");
+      byId.get(id)?.setAttribute("aria-current", "true");
+    };
+
+    setActive(links[0]?.dataset.tocLink);
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          if (entry.isIntersecting) setActive(entry.target.id);
+        }
+      },
+      { rootMargin: "-20% 0% -35% 0%" },
+    );
+
+    for (const id of byId.keys()) {
+      const heading = document.getElementById(id);
+      if (heading) observer.observe(heading);
+    }
+
+    root.addEventListener("click", (event) => {
+      const link = event.target.closest("[data-toc-link]");
+      if (!link) return;
+      const id = link.dataset.tocLink;
+      const heading = document.getElementById(id);
+      if (!heading) return;
+      event.preventDefault();
+      // Offset so the heading clears the sticky page header.
+      const top = heading.getBoundingClientRect().top + window.scrollY - 96;
+      window.scrollTo({ top, behavior: "smooth" });
+      history.replaceState(null, "", `#${id}`);
+    });
+  }
+</script>

@@ -1,0 +1,55 @@
+---
+/* What this example actually demonstrates — the reason a developer landed here
+   from a search result. Each item points at the file that implements it. */
+const features = [
+  {
+    title: "Response cache with real tags",
+    body: "Route rules hold each rendered page for an hour and serve it stale for a day while it refreshes — and every entry carries cache tags.",
+    file: "astro.config.mjs",
+  },
+  {
+    title: "On-demand revalidation",
+    body: "A signed webhook from the CMS calls cache.invalidate({ tags }), so a published post goes live immediately without a redeploy.",
+    file: "src/pages/api/revalidate/all.js",
+  },
+  {
+    title: "Zero client-side framework",
+    body: "The table of contents, reading bar and share menu are plain <script> tags on server-rendered HTML. No React, no Vue, no hydration.",
+    file: "src/components/blog/TableOfContents.astro",
+  },
+  {
+    title: "Server-rendered article body",
+    body: "CMS HTML gets stable heading anchors and a table of contents in one pass while rendering, instead of being parsed again in the browser.",
+    file: "src/lib/content.js",
+  },
+  {
+    title: "SEO, done properly",
+    body: "Canonicals, Open Graph, BlogPosting and BreadcrumbList JSON-LD, a generated sitemap, and a single switch that gates indexing.",
+    file: "src/components/layout/Seo.astro",
+  },
+  {
+    title: "One CMS boundary",
+    body: "Two functions stand between your components and the API. Swap in Contentful, Sanity or Strapi without touching a component.",
+    file: "src/lib/cms.js",
+  },
+];
+---
+
+<section class="mx-auto max-w-7xl px-6 py-16 sm:py-20">
+  <h2 class="text-3xl font-semibold text-white sm:text-4xl">What this example demonstrates</h2>
+  <p class="mt-2 max-w-2xl text-zinc-400">
+    The parts most headless CMS tutorials leave out — and where to find each one in the repo.
+  </p>
+
+  <div class="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+    {
+      features.map((feature) => (
+        <div class="rounded-2xl border border-white/10 bg-white/[0.03] p-6 transition hover:border-white/20">
+          <h3 class="font-semibold text-white">{feature.title}</h3>
+          <p class="mt-2.5 text-sm leading-relaxed text-zinc-400">{feature.body}</p>
+          <code class="mt-4 block font-mono text-xs break-all text-cyan-300/80">{feature.file}</code>
+        </div>
+      ))
+    }
+  </div>
+</section>

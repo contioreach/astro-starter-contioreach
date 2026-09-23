@@ -1,0 +1,54 @@
+---
+import BlogDetail from "../../components/blog/BlogDetail.astro";
+import CTASection from "../../components/blog/CTASection.astro";
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import { getPost, getRelated } from "../../lib/cms.js";
+import { blogPostingSchema, breadcrumbSchema } from "../../lib/schema.js";
+
+const { slug } = Astro.params;
+const post = await getPost(slug);
+
+if (!post) {
+  return Astro.rewrite("/404");
+}
+
+/* On top of the route rule's `blogs` tag, the post carries its own — so a
+   single article can be invalidated without dropping every listing. */
+Astro.cache.set({ tags: [`blog-${post.slug}`] });
+
+const relatedBlogs = await getRelated(post.categorySlug, post.id);
+
+const seo = {
+  title: `${post.title} | ContioReach`,
+  description: post.description || post.excerpt,
+  path: `/blog/${post.slug}`,
+  image: post.coverImage || undefined,
+  alt: post.title,
+  type: "article",
+  publishedTime: post.publishedAt,
+  modifiedTime: post.updatedAt,
+  keywords: [
+    post.category?.toLowerCase(),
+    post.primaryKeyword,
+    ...(post.tags?.map((tag) => tag.name?.toLowerCase()) || []),
+    "headless cms",
+    "content marketing",
+    "blog",
+  ].filter(Boolean),
+};
+
+/* Home > Blog > Article — the leaf uses the post's own title rather than the
+   SEO title with its site suffix. */
+const jsonLd = [
+  breadcrumbSchema([
+    { name: "Blog", path: "/blog" },
+    { name: post.title, path: `/blog/${post.slug}` },
+  ]),
+  blogPostingSchema(post),
+];
+---
+
+<BaseLayout seo={seo} jsonLd={jsonLd}>
+  <BlogDetail post={post} relatedBlogs={relatedBlogs} />
+  <CTASection />
+</BaseLayout>

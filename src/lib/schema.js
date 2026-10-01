@@ -34,7 +34,7 @@ export function blogPostingSchema(post) {
       url: PUBLIC_SITE_URL,
     },
     keywords:
-      [post.primaryKeyword, ...(post.tags?.map((tag) => tag.name) || [])]
+      [post.primaryKeyword, ...(post.secondaryKeywords || []), ...(post.tags?.map((tag) => tag.name) || [])]
         .filter(Boolean)
         .join(", ") || undefined,
   };

@@ -23,7 +23,9 @@ export default defineConfig({
     schema: {
       CMS_API_URL: envField.string({ context: "server", access: "secret", url: true }),
       CMS_API_KEY: envField.string({ context: "server", access: "secret" }),
-      REVALIDATION_SECRET: envField.string({ context: "server", access: "secret" }),
+      /* Optional until you set the webhook up — while it is empty the webhook
+         rejects every call, so the site still runs on a fresh clone. */
+      REVALIDATION_SECRET: envField.string({ context: "server", access: "secret", optional: true }),
 
       PUBLIC_SITE_URL: envField.string({ context: "client", access: "public", url: true }),
       PUBLIC_ALLOW_INDEXING: envField.boolean({ context: "client", access: "public", default: false }),

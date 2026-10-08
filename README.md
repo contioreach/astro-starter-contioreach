@@ -5,13 +5,35 @@ A complete, production-shaped blog built with **Astro 7** and a **headless CMS**
 Not a toy. It ships the things a real content site actually needs and most examples skip: a tagged response cache, an on-demand revalidation webhook, category archives, pagination, a table of contents generated from the article body, full SEO metadata, JSON-LD, and a sitemap — with **no client-side framework at all**.
 
 ```bash
+npx create-contioreach-blog my-blog --framework astro
+cd my-blog
+npm run dev
+```
+
+It runs on ContioReach's demo content straight away — [switch to your own posts](#use-your-own-content) whenever you are ready. Or set it up by hand:
+
+```bash
 npx degit contioreach/astro-starter-contioreach my-blog
 cd my-blog && npm install
-cp .env.example .env   # add your API key
+cp .env.example .env   # demo key included
 npm run dev
 ```
 
 > Looking for another stack? See the [Next.js](https://github.com/contioreach/nextjs-starter-contioreach), [Nuxt](https://github.com/contioreach/nuxtjs-starter-contioreach), [SvelteKit](https://github.com/contioreach/sveltekit-starter-contioreach), [Remix](https://github.com/contioreach/remix-starter-contioreach), [Gatsby](https://github.com/contioreach/gatsby-starter-contioreach), [React](https://github.com/contioreach/react-starter-contioreach) and [Vue](https://github.com/contioreach/vue-starter-contioreach) examples.
+
+---
+
+## Use your own content
+
+The starter ships with the read-only key of the ContioReach demo workspace, so it renders real posts the moment you run it — with a banner across the top saying so. The banner shows whenever `CMS_API_KEY` is the demo key, including on a deployed site, and goes away by itself once you switch. Nothing in the code changes.
+
+1. Create a free account at [app.contioreach.com/signup](https://app.contioreach.com/signup?ref=cli&fw=astro).
+2. In the dashboard, open **Developer Settings → API Keys** and copy your key.
+3. Paste it into `.env` as `CMS_API_KEY`, in place of the demo key.
+4. Restart the dev server. The banner disappears and the blog shows your own posts.
+5. Once the site is deployed, open **Developer Settings → Webhook Integration**, enter `https://your-site.com/api/revalidate/all`, click **Generate** and save. Set the same value as `REVALIDATION_SECRET` in your host's environment. Publishing now updates the site without a redeploy.
+
+If ContioReach rejects the key, the banner turns into an "Invalid API key" notice instead — usually a key that was only partly copied.
 
 ---
 
@@ -52,7 +74,7 @@ PUBLIC_SIGNUP_URL=https://app.contioreach.com/signup
 PUBLIC_LOGIN_URL=https://app.contioreach.com/login
 ```
 
-Get `CMS_API_KEY` and `REVALIDATION_SECRET` from your ContioReach workspace settings (the free plan is enough).
+Get `CMS_API_KEY` and `REVALIDATION_SECRET` from your ContioReach workspace settings (the free plan is enough). `REVALIDATION_SECRET` is the one exception to "required": it can stay empty until you set up the webhook, and the webhook rejects every call while it is.
 
 Every variable is declared once, in [`astro.config.mjs`](astro.config.mjs) under `env`, where **Astro validates it for you** — type, URL-ness and presence. A missing or malformed variable fails at startup with a named error instead of quietly 401ing against the CMS. The three CMS values are declared `context: "server", access: "secret"`, so they never enter the client bundle; the `PUBLIC_*` four are the only ones that reach the browser.
 

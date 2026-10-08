@@ -1,0 +1,114 @@
+---
+import { PUBLIC_SIGNUP_URL } from "astro:env/client";
+import { REPO_URL } from "../../consts.js";
+import { getApiKeyStatus } from "../../lib/cms.js";
+
+/* Top-of-page notice while the site runs on the demo workspace's key, or on a
+   key the CMS rejects. Decided here, on the server — only the resulting markup
+   reaches the browser, never the key. It goes away by itself once CMS_API_KEY
+   holds a working key of your own. */
+
+const status = await getApiKeyStatus();
+const HELP_URL = `${REPO_URL}#use-your-own-content`;
+
+// Lets signups that start here be counted, and by framework.
+const signup = new URL(PUBLIC_SIGNUP_URL);
+signup.searchParams.set("ref", "cli");
+signup.searchParams.set("fw", "astro");
+---
+
+{
+  status === "invalid" && (
+    <div role="alert" class="border-b border-amber-400/25 bg-amber-400/[0.08]">
+      <div class="mx-auto flex max-w-7xl items-start gap-3 px-6 py-2.5 sm:items-center">
+        <span class="mt-0.5 shrink-0 rounded-full border border-amber-400/30 bg-amber-400/10 px-2 py-0.5 font-mono text-[11px] font-medium tracking-wider text-amber-200 uppercase sm:mt-0">
+          Key error
+        </span>
+        <p class="flex-1 text-sm leading-relaxed text-zinc-300">
+          Invalid API key. ContioReach rejected the <code class="font-mono text-amber-200">CMS_API_KEY</code> in{" "}
+          <code class="font-mono text-amber-200">.env</code> — copy it again from Developer Settings and restart the dev
+          server.{" "}
+          <a
+            href={HELP_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            class="font-semibold whitespace-nowrap text-white underline decoration-amber-400/60 underline-offset-4 transition hover:decoration-amber-300"
+          >
+            How to set your key
+          </a>
+        </p>
+      </div>
+    </div>
+  )
+}
+
+{
+  status === "demo" && (
+    <div
+      id="demo-banner"
+      role="region"
+      aria-label="Demo content notice"
+      class="border-b border-fuchsia-400/20 bg-gradient-to-r from-fuchsia-500/[0.12] via-zinc-950 to-cyan-400/[0.12]"
+    >
+      <div class="mx-auto flex max-w-7xl items-start gap-3 px-6 py-2.5 sm:items-center">
+        <span class="mt-0.5 shrink-0 rounded-full border border-fuchsia-400/30 bg-fuchsia-400/10 px-2 py-0.5 font-mono text-[11px] font-medium tracking-wider text-fuchsia-200 uppercase sm:mt-0">
+          Demo
+        </span>
+        <p class="flex-1 text-sm leading-relaxed text-zinc-300">
+          You're viewing demo content. Create your free ContioReach account and set your API key in{" "}
+          <code class="font-mono text-cyan-300">.env</code> to show your own posts.{" "}
+          <span class="whitespace-nowrap">
+            <a
+              href={signup.toString()}
+              class="font-semibold text-white underline decoration-fuchsia-400/60 underline-offset-4 transition hover:decoration-fuchsia-300"
+            >
+              Create account →
+            </a>
+            <span class="mx-2 text-zinc-600" aria-hidden="true">·</span>
+            <a
+              href={HELP_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              class="text-zinc-300 underline decoration-white/20 underline-offset-4 transition hover:text-white"
+            >
+              How to set your key
+            </a>
+          </span>
+        </p>
+        <button
+          type="button"
+          data-dismiss
+          aria-label="Dismiss demo notice"
+          class="-mr-1.5 shrink-0 rounded-md p-1.5 text-zinc-400 transition hover:bg-white/10 hover:text-white"
+        >
+          <svg viewBox="0 0 20 20" class="h-4 w-4 fill-current" aria-hidden="true">
+            <path d="M5.28 4.22a.75.75 0 0 0-1.06 1.06L8.94 10l-4.72 4.72a.75.75 0 1 0 1.06 1.06L10 11.06l4.72 4.72a.75.75 0 1 0 1.06-1.06L11.06 10l4.72-4.72a.75.75 0 0 0-1.06-1.06L10 8.94 5.28 4.22Z" />
+          </svg>
+        </button>
+      </div>
+    </div>
+  )
+}
+
+{
+  /* Hidden for this browser session only: it comes back on the next visit for
+     as long as the demo key is still in use. Inline and right after the
+     banner, so a dismissed one is removed before it ever paints. */
+  status === "demo" && (
+    <script is:inline>
+      (() => {
+        const KEY = "contioreach-demo-banner-dismissed";
+        const banner = document.getElementById("demo-banner");
+        try {
+          if (sessionStorage.getItem(KEY) === "1") return banner.remove();
+        } catch {}
+        banner.querySelector("[data-dismiss]").addEventListener("click", () => {
+          banner.remove();
+          try {
+            sessionStorage.setItem(KEY, "1");
+          } catch {}
+        });
+      })();
+    </script>
+  )
+}

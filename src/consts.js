@@ -30,6 +30,12 @@ export const CONTACT_URL = "https://contioreach.com/contact-us";
 export const REPO_URL = "https://github.com/contioreach/astro-starter-contioreach";
 export const CMS_SITE_URL = "https://contioreach.com";
 
+/* The read-only key of the ContioReach demo workspace, and the default in
+   .env.example — so a fresh clone renders real posts before you have an
+   account. While it is the key in use, every page shows the demo banner
+   (src/components/layout/DemoBanner.astro). Replacing it is the only switch. */
+export const DEMO_API_KEY = "cms_a77631bccba461401bf5fd25b0402acd163623af5a5fc0ca";
+
 export const EMPTY_META = {
   page: 1,
   limit: 12,

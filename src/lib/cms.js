@@ -1,5 +1,5 @@
 import { CMS_API_KEY, CMS_API_URL } from "astro:env/server";
-import { API_ENDPOINTS, EMPTY_META } from "../consts.js";
+import { API_ENDPOINTS, DEMO_API_KEY, EMPTY_META, REVALIDATE_TIME } from "../consts.js";
 
 /* Every read goes through here. There is no data cache in front of it on
    purpose: Astro caches the *rendered response* instead (see `routeRules` in
@@ -179,6 +179,29 @@ export async function loadListing({ page = 1, limit = 12, category } = {}) {
     categoriesResult.status === "fulfilled" ? categoriesResult.value.data || [] : [];
 
   return { posts, meta, categories };
+}
+
+/* What the demo banner needs to know about CMS_API_KEY, and nothing more — the
+   key itself never leaves the server. "demo" while the demo key is set,
+   "invalid" when the CMS rejects the key, otherwise null. A network failure is
+   not the key's fault, so it reads as null too. The CMS probe is remembered
+   per process for the usual window, so it is not one extra request per page. */
+let keyProbe = { status: null, checkedAt: 0 };
+
+export async function getApiKeyStatus() {
+  if (CMS_API_KEY === DEMO_API_KEY) return "demo";
+  if (Date.now() - keyProbe.checkedAt < REVALIDATE_TIME * 1000) return keyProbe.status;
+
+  try {
+    const response = await fetch(`${CMS_API_URL}${API_ENDPOINTS.CATEGORIES}?limit=1`, {
+      headers: { "Content-Type": "application/json", "X-API-Key": CMS_API_KEY },
+    });
+    const status = response.status === 401 ? "invalid" : null;
+    keyProbe = { status, checkedAt: Date.now() };
+    return status;
+  } catch {
+    return null;
+  }
 }
 
 /* ---- helpers for the sitemap ---- */
